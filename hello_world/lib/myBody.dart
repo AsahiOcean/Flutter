@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MyBody extends StatelessWidget{
   Widget build(BuildContext context) {
@@ -9,8 +10,15 @@ class MyBody extends StatelessWidget{
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           new Text('Hello World!'),
-          new FlatButton(onPressed: (){},
-            child: Text('Open'),
+          new FlatButton(onPressed: () async {
+            const url = 'https://github.com/AsahiOcean';
+            if (await canLaunch(url)) {
+              await launch(url);
+            } else {
+              throw 'Could not launch $url';
+            }
+          }, child:
+            Text('Open GitHub'),
             color: Colors.red,
             textColor: Colors.white,)]
     ));
