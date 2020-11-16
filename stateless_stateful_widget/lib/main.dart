@@ -1,113 +1,104 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MyApp());
-}
+// ignore: must_be_immutable
+class MailBox extends StatelessWidget {
+  final String _title; // заголовок новостного сообщения
+  /// final == переменная должна быть объявлена при создании экземпляра класса и не может быть изменена
+  /// _ перед переменной говорит о том, что переменная скрыта и доступна только внутри объекта данного класса
+  final String _text;
+  String _imageUrl;
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  /// название конструктора должно совпадать с именем нашего класса
+  MailBox(this._title, this._text, {String imageUrl}) {
+    _imageUrl = imageUrl;
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+    final double N = MediaQuery.of(context).size.height / 10;
+
+    /// проверка не только на то что адрес изображения определен, но и что он не пустой
+    if(_imageUrl != null && _imageUrl != ''){
+      return new Container (
+          color: Colors.black12,
+          height: N,
+          child: new Row(children: [
+            new Padding(padding:
+              new EdgeInsets.symmetric(vertical: 5), child: /// добавим отступ
+                new Image.network(_imageUrl,
+                  width: N, height: N, /// параметры высоты и ширины возьмем
+                  fit: BoxFit.fitHeight, /// способ кадрирования и заполнения
+                ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+            new Expanded(child: /// для ограничения размеров дочерних виджетов, без него виджет Column может иметь безграничные размеры и выходить за края экрана
+              new Container(padding: /// Container со свойством padding создает внутри контейнера отступы
+                new EdgeInsets.all(5.0), child:
+                  new Column(children: <Widget>[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        color: Colors.redAccent.shade100,
+                        child: new Text(_title,
+                            style: new TextStyle( /// применили стиль с увеличенным размером
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              ),
+                            overflow: TextOverflow.ellipsis /// свойство overflow позволяет обрезать слишком длинный текст
+                            ),
+                      ),
+                    ),
+                      new Expanded(child:
+                        new Text(_text,
+                          softWrap: true, /// перенос текста с помощью параметра softWrap
+                          textAlign: TextAlign.justify, /// выравнивание по ширине, в случае слишком длинного текста, виджет Expanded обрежет все то что не войдет по высоте
+                        )
+                      )
+                  ]))
+            )
+          ])
+      );
+    } else {
+      return new Container(
+          color: Colors.black12, /// цвет фона блока
+          height: 100.0, /// высота (height ожидает значение типа Double поэтому 100.0, а не 100)
+          child: new Row(children: [
+            new Expanded(child:
+              new Container(padding:
+                new EdgeInsets.all(5.0), child:
+                  new Column(children: [
+                    new Text(_title, style:
+                      new TextStyle(fontSize: 20.0),
+                        overflow: TextOverflow.ellipsis
+                    ),
+                    new Expanded(child:
+                      new Text(_text,
+                        softWrap: true,
+                        textAlign: TextAlign.justify,
+                      )
+                    )
+              ]))
+            )
+          ])
+      );
+    }
   }
 }
+
+void main() =>  runApp(
+    new MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: new Scaffold(
+            appBar: new AppBar(
+                title: const Text('Уведомления',
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white
+                  )),
+              backgroundColor: Colors.pink,
+            ),
+            body: new MailBox('Поздравляем вас!',
+                'Вы отважно продвигаетесь вперед, шаг за шагом позновая что-то новое преодолевая все сопутсвующие трудности! Так держать!',
+                imageUrl: 'https://media3.giphy.com/media/etorBhgWm3wOgsYQdT/giphy.gif')
+        )
+    )
+);
